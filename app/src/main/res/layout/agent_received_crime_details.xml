@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Crime Category:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8" />
+
+        <TextView
+            android:id="@+id/text_crime_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="#F7FAF8F8" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Type Of Crime:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+        <TextView
+            android:id="@+id/text_crime_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#F7FAF8F8"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Reporter's Crime Description:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+        <TextView
+            android:id="@+id/text_crime_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#F7FAF8F8"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="Type of Reporter:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+        <TextView
+            android:id="@+id/text_reported_as"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#F7FAF8F8"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="SET ACTIONS AND LEAVE AN INVESTIGATION REPORT:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="Agent Report:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+        <EditText
+            android:id="@+id/editAgentReport"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:textColor="#F7FAF8F8"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/common_google_signin_btn_text_dark_default"
+            android:ems="15"
+            android:hint="Description of your findings"
+            android:inputType="textPersonName"
+            android:padding="10dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="Set Investigation Status:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#F7FAF8F8"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:background="@color/common_google_signin_btn_text_dark_default"
+            android:dropDownWidth="wrap_content"
+            android:ems="15"
+            android:padding="10dp"
+            android:hint="Under Investigation"
+            android:textColor="@android:color/black"/>
+
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

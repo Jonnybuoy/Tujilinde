@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "617188219367",
+    "firebase_url": "https://tujilinde-bccaa.firebaseio.com",
+    "project_id": "tujilinde-bccaa",
+    "storage_bucket": "tujilinde-bccaa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617188219367:android:955a8b43af542eb67c0542",
+        "android_client_info": {
+          "package_name": "com.example.tujilinde"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "617188219367-jgccbhcjj4ku6uortd9mqgq8e9jkk408.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByU920zZ4KK5C7SdO_Is1TLaKFhU6fbjA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "617188219367-jgccbhcjj4ku6uortd9mqgq8e9jkk408.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

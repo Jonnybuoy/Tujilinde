@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F6F8"
+    android:orientation="vertical">
+
+
+    <TableLayout
+        android:id="@+id/details_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="30dp">
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#009688"
+                android:gravity="center"
+                android:text="Date of Report"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#009688"
+                android:gravity="center"
+                android:text="Report reference number"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#009688"
+                android:gravity="center"
+                android:text="Investigation status"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/date_of_report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Date"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/ref_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:text="R-CODE"
+                android:textColor="#03A9F4"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textInvestigationStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Status"
+                android:textStyle="bold" />
+        </TableRow>
+
+
+    </TableLayout>
+
+
+</LinearLayout>
