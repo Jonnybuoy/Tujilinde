@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -56,10 +57,10 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         // Required empty public constructor
     }
 
-    @Nullable
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            mView = inflater.inflate(R.layout.fragment_agent_maps, container, false);
+    public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.fragment_agent_maps, container, false);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -76,7 +77,7 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         return mView;
     }
 
-
+    /*Get the id of the reporter mapped to the available security agent*/
     private void getAssignedReporter(){
         String agentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference assignedReporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentId).child("reporterId");
@@ -96,6 +97,7 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         });
     }
 
+    /*Get the location of the civilian making the crime report*/
     private void getAssignedReporterLocation(){
         DatabaseReference assignedReporterLocation = FirebaseDatabase.getInstance().getReference().child("crimeAlert").child(civilianReporterId).child("l");
         assignedReporterLocation.addValueEventListener(new ValueEventListener() {
@@ -135,11 +137,18 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         locationRequest.setFastestInterval(2000);
         locationRequest.setInterval(4000);
 
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
-        }else{
-            callPermissions();
+            if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+            }else{
+                callPermissions();
+            }
         }
+
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
+        mMap.setMyLocationEnabled(true);
+
 
     }
 
@@ -150,10 +159,13 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         @Override
         public void onLocationResult(LocationResult locationResult) {
             for(Location location : locationResult.getLocations()){
-                mLastLocation = location;
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+                if(getContext()!=null){
+                    mLastLocation = location;
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+                }
+
 
 
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();

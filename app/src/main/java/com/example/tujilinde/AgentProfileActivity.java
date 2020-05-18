@@ -67,7 +67,7 @@ public class AgentProfileActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         userId = mAuth.getCurrentUser().getUid();
-        mAgentDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(userId);
+        mAgentDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(userId).child("Profile Details");
 
         getUserInformation();
 

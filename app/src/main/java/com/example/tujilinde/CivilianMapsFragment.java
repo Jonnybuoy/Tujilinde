@@ -104,9 +104,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
                     mReportBtn.setText("REPORT IN PROGRESS...");
 
-                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
-
-                    startActivity(intent);
+//                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+//
+//                    startActivity(intent);
 
 
                     getClosestAgents();
@@ -118,6 +118,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
         return mView;
     }
 
+    /*Check for security agents within the radius of the civilian making the report*/
     private void getClosestAgents(){
         DatabaseReference agentLocation = FirebaseDatabase.getInstance().getReference().child("agentsAvailable");
 
@@ -127,6 +128,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
         geoQuery.removeAllListeners();
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            /*when a security agent near location is found, set agentFound to true and get their key id*/
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 if(!agentFound){
@@ -134,7 +136,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     agentFoundID = key;
 
 
-                    // tell security agent which reporter to attend to
+                    // map found security agent to reporter to attend to
                     DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID);
                     String civilianReporterId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     HashMap map = new HashMap();
@@ -145,7 +147,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     mReportBtn.setText("Looking for Security Agent location...");
 
                 }
+                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
 
+                    startActivity(intent);
 
             }
 
