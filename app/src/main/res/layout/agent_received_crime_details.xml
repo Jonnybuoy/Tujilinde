@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#333333"
     android:orientation="vertical">
 
     <LinearLayout
@@ -46,14 +47,14 @@
             android:layout_weight="1"
             android:text="Type Of Crime:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
         <TextView
             android:id="@+id/text_crime_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
     </LinearLayout>
 
@@ -71,14 +72,14 @@
             android:layout_weight="1"
             android:text="Reporter's Crime Description:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
         <TextView
             android:id="@+id/text_crime_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
     </LinearLayout>
 
@@ -98,36 +99,17 @@
             android:singleLine="true"
             android:text="Type of Reporter:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
         <TextView
             android:id="@+id/text_reported_as"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:weightSum="2">
-
-
-        <TextView
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:singleLine="true"
-            android:text="SET ACTIONS AND LEAVE AN INVESTIGATION REPORT:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
-
-    </LinearLayout>
 
 
     <LinearLayout
@@ -146,20 +128,31 @@
             android:singleLine="true"
             android:text="Agent Report:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
 
         <EditText
             android:id="@+id/editAgentReport"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:textColor="#F7FAF8F8"
             android:layout_height="100dp"
             android:layout_marginTop="16dp"
+            android:layout_weight="1"
             android:background="@color/common_google_signin_btn_text_dark_default"
             android:ems="15"
             android:hint="Description of your findings"
             android:inputType="textPersonName"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:textColor="#F7FAF8F8" />
 
     </LinearLayout>
 
@@ -179,9 +172,10 @@
             android:singleLine="true"
             android:text="Set Investigation Status:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8"/>
+            android:textColor="#F7FAF8F8" />
 
         <Spinner
+            android:id="@+id/spinnerStatus"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
@@ -189,14 +183,29 @@
             android:background="@color/common_google_signin_btn_text_dark_default"
             android:dropDownWidth="wrap_content"
             android:ems="15"
+            android:hint="Set Crime Case Status"
             android:padding="10dp"
-            android:hint="Under Investigation"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black" />
+
 
 
 
     </LinearLayout>
 
+
+    <Button
+        android:id="@+id/findingsSubmitBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="1dp"
+        android:background="#009688"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="SUBMIT FINDINGS"
+        android:textColor="#0F1010"
+        android:textStyle="bold" />
 
 
 </LinearLayout>

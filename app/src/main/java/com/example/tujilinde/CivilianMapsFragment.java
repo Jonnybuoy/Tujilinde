@@ -147,9 +147,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     mReportBtn.setText("Looking for Security Agent location...");
 
                 }
-                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+                Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
 
-                    startActivity(intent);
+                startActivity(intent);
 
             }
 
