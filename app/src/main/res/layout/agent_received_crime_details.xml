@@ -124,9 +124,12 @@
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
+            android:background="#0E0E0E"
+            android:gravity="center"
             android:singleLine="true"
-            android:text="Agent Report:  "
+            android:text="UPDATE YOUR INVESTIGATION FINDINGS:"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#F7FAF8F8" />
 
@@ -174,18 +177,31 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#F7FAF8F8" />
 
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="1">
+
         <Spinner
             android:id="@+id/spinnerStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:background="@color/common_google_signin_btn_text_dark_default"
             android:dropDownWidth="wrap_content"
             android:ems="15"
-            android:hint="Set Crime Case Status"
+            android:hint="Set Crime Scene Status"
             android:padding="10dp"
             android:textColor="@android:color/black" />
+
+
 
 
 
@@ -193,19 +209,38 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/findingsSubmitBtn"
-        android:layout_width="wrap_content"
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="1dp"
-        android:layout_marginBottom="1dp"
-        android:background="#009688"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="SUBMIT FINDINGS"
-        android:textColor="#0F1010"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/findingsSubmitBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#009688"
+            android:layout_gravity="right"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="SUBMIT FINDINGS"
+            android:textColor="#0F1010"
+            android:textStyle="bold" />
+
+
+
+    </LinearLayout>
+
+
+
+
+
 
 
 </LinearLayout>

@@ -69,9 +69,9 @@ public class AgentReceivedCrimeDetails extends Fragment {
         mFindingsSubmit = mView.findViewById(R.id.findingsSubmitBtn);
 
         final List<String> reportStatus = new ArrayList<>();
-        reportStatus.add(0, "Set Crime Case Status");
+        reportStatus.add(0, "Crime Scene Status");
         reportStatus.add(1, "Under Investigation");
-        reportStatus.add(2, "Investigation Pending Outcome");
+        reportStatus.add(2, "False Crime Scene");
         reportStatus.add(3, "Investigation Closed");
 
         ArrayAdapter<String> dataAdapter1;
@@ -82,7 +82,7 @@ public class AgentReceivedCrimeDetails extends Fragment {
         mStatusCrime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(parent.getItemAtPosition(position).equals("Set Crime Case Status")){
+                if(parent.getItemAtPosition(position).equals("Crime Scene Status")){
                     mStatusCrime.setPrompt("You need to choose a selection");
                 }
                 else {
