@@ -78,6 +78,14 @@ public class CivilianNavigationActivity extends AppCompatActivity implements Nav
             case R.id.contact:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new CivilianContactFragment()).commit();                break;
+
+            case R.id.securityPin:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new SetPasscodeFragment()).commit();                break;
+
+            case R.id.logoff:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new SignOutFragment()).commit();                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

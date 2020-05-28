@@ -27,6 +27,20 @@
         android:icon="@drawable/ic_contact"
         android:title="Contact Us"/>
 
+    <group android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/securityPin"
+            android:title="Set access passcode"
+            android:icon="@drawable/ic_passcode"/>
+
+        <item
+            android:id="@+id/logoff"
+            android:title="Sign Out"
+            android:icon="@drawable/ic_logout"/>
+
+    </group>
+
 
 
 
