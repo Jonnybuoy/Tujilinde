@@ -54,17 +54,25 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
     private View mView;
     private GoogleMap mMap;
+
+
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     Location mLastLocation;
+    private LatLng alertLocation;
+    GeoQuery geoQuery;
+    private DatabaseReference agentLocationRef;
+    private ValueEventListener agentLocationRefListener;
+    private Marker locationMarker;
+
+
+
+    private Button mReportBtn, mCancelBtn;
+
     private int radius = 1;
     private Boolean agentFound = false;
     private String agentFoundID;
-
-
-    private Button mReportBtn;
-
-    private LatLng alertLocation;
+    private Boolean requestBol = false;
 
     public CivilianMapsFragment() {
         // Required empty public constructor
@@ -88,11 +96,13 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
 
         mReportBtn = mView.findViewById(R.id.reportBtn);
+        mCancelBtn = mView.findViewById(R.id.cancelReportBtn);
 
         mReportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mLastLocation != null) {
+                    requestBol = true;
                     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
@@ -100,7 +110,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     geoFire.setLocation(userId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 
                     alertLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(alertLocation).title("My location"));
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(alertLocation).title("My location"));
 
                     mReportBtn.setText("REPORT IN PROGRESS...");
 
@@ -115,6 +125,38 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
             }
         });
 
+        mCancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (requestBol){
+                    requestBol = false;
+                    geoQuery.removeAllListeners();
+                    agentLocationRef.removeEventListener(agentLocationRefListener);
+
+                    if (agentFoundID != null){
+                        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID);
+                        agentRef.setValue(true);
+                        agentFoundID = null;
+                    }
+
+                    agentFound = false;
+                    radius = 1;
+
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
+                    GeoFire geoFire = new GeoFire(ref);
+                    geoFire.removeLocation(userId);
+
+                    if (locationMarker != null){
+                        locationMarker.remove();
+                    }
+                    mReportBtn.setText("REPORT A CRIME");
+                }
+
+            }
+        });
+
         return mView;
     }
 
@@ -124,14 +166,14 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
         GeoFire geoFire = new GeoFire(agentLocation);
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(alertLocation.latitude, alertLocation.longitude), radius);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(alertLocation.latitude, alertLocation.longitude), radius);
         geoQuery.removeAllListeners();
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             /*when a security agent near location is found, set agentFound to true and get their key id*/
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                if(!agentFound){
+                if(!agentFound && requestBol){
                     agentFound = true;
                     agentFoundID = key;
 
@@ -183,11 +225,11 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
     // Alert reporter on agent location
     private Marker mAgentMarker;
     private void getAgentLocation(){
-        DatabaseReference agentLocationRef = FirebaseDatabase.getInstance().getReference().child("agentsWorking").child(agentFoundID).child("l");
-        agentLocationRef.addValueEventListener(new ValueEventListener() {
+        agentLocationRef = FirebaseDatabase.getInstance().getReference().child("agentsWorking").child(agentFoundID).child("l");
+        agentLocationRefListener = agentLocationRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if(dataSnapshot.exists() && requestBol){
                     List<Object> map = (List<Object>) dataSnapshot.getValue();
                     double locationLat = 0;
                     double locationLng = 0;
@@ -222,10 +264,6 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
                     mAgentMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Available Agent"));
 
-
-//                    Intent intent = new Intent(getActivity(), AgentMapsActivity.class);
-//
-//                    startActivity(intent);
 
 
 

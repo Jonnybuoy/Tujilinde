@@ -6,12 +6,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 public class CivilianRegisterActivity extends AppCompatActivity {
     EditText mPhone;
     Button mRegister;
-
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +48,12 @@ public class CivilianRegisterActivity extends AppCompatActivity {
                 intent.putExtra("mobile", mobile);
                 startActivity(intent);
 
+
             }
         });
     }
 }
+
 
 
 //package com.example.tujilinde;

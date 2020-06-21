@@ -68,6 +68,7 @@ public class CrimeDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveCrimeDetails();
+                finish();
             }
         });
 
@@ -281,8 +282,6 @@ public class CrimeDetailsActivity extends AppCompatActivity {
         crimeDetails.put("Date of report", currentTime);
         crimeDetails.put("Reference code", "RF" + reference_number);
         reportDetailsRef.updateChildren(crimeDetails);
-
-        finish();
 
 
     }

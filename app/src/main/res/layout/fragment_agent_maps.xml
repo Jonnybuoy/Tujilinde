@@ -1,14 +1,55 @@
 <FrameLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".AgentMapsFragment" >
-
-<fragment
-    android:id="@+id/agent_map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+    android:layout_height="match_parent"
+    tools:context=".AgentMapsFragment" >
+
+    <fragment
+        android:id="@+id/agent_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/crimeAlertInfo"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/typeCrime"
+            android:paddingBottom="10sp"
+            android:paddingTop="20sp"
+            android:textAllCaps="true"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/descriptionCrime"
+            android:paddingBottom="10sp"
+            android:paddingTop="20sp"
+            android:textStyle="italic"/>
+
+        <Button
+            android:id="@+id/responseBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#009688"
+            android:text="RESPOND TO ALERT"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+
+
+
 
 </FrameLayout>

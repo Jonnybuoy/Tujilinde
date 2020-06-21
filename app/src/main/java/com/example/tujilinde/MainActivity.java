@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
     Button homeRegister;
+    Button homeAccessBtn;
     private DatabaseReference current_user_db;
     private String user_id;
     FirebaseAuth mAuth;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         homeRegister = findViewById(R.id.homeRegbtn);
+        homeAccessBtn = findViewById(R.id.homeLoginbtn);
 
         homeRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,5 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
     }
 }

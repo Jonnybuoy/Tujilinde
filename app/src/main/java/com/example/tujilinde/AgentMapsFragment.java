@@ -11,6 +11,9 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +35,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -40,7 +44,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
@@ -50,7 +56,16 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
     LocationRequest locationRequest;
     Location mLastLocation;
 
+    Marker locationMarker;
+
     private String civilianReporterId = "";
+
+    DatabaseReference assignedReporterLocation;
+    private ValueEventListener assignedReporterLocationListener;
+
+    private LinearLayout mCrimeAlertInfo;
+    private TextView mCrimeTypeInfo, mCrimeDescriptionInfo;
+    private Button mResponseBtn;
 
 
     public AgentMapsFragment(){
@@ -61,6 +76,11 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_agent_maps, container, false);
+
+        mCrimeAlertInfo = mView.findViewById(R.id.crimeAlertInfo);
+        mCrimeTypeInfo = mView.findViewById(R.id.typeCrime);
+        mCrimeDescriptionInfo = mView.findViewById(R.id.descriptionCrime);
+        mResponseBtn = mView.findViewById(R.id.responseBtn);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -73,6 +93,13 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
 
         getAssignedReporter();
+
+        mResponseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recordAlertResponse();
+            }
+        });
 
         return mView;
     }
@@ -87,7 +114,22 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
                 if(dataSnapshot.exists()){
                     civilianReporterId = dataSnapshot.getValue().toString();
                     getAssignedReporterLocation();
+                    getAssignedReportInfo();
+                }else {
+                    civilianReporterId = "";
+                    if (locationMarker != null){
+                        locationMarker.remove();
+                    }
+                    if (assignedReporterLocationListener != null){
+                        assignedReporterLocation.removeEventListener(assignedReporterLocationListener);
+                    }
+                    mCrimeAlertInfo.setVisibility(View.GONE);
+                    mCrimeTypeInfo.setText("");
+                    mCrimeDescriptionInfo.setText("");
+
+
                 }
+
             }
 
             @Override
@@ -99,11 +141,11 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
     /*Get the location of the civilian making the crime report*/
     private void getAssignedReporterLocation(){
-        DatabaseReference assignedReporterLocation = FirebaseDatabase.getInstance().getReference().child("crimeAlert").child(civilianReporterId).child("l");
-        assignedReporterLocation.addValueEventListener(new ValueEventListener() {
+        assignedReporterLocation = FirebaseDatabase.getInstance().getReference().child("crimeAlert").child(civilianReporterId).child("l");
+        assignedReporterLocationListener = assignedReporterLocation.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if(dataSnapshot.exists() && !civilianReporterId.equals("")){
                     List<Object> map = (List<Object>) dataSnapshot.getValue();
                     double locationLat = 0;
                     double locationLng = 0;
@@ -115,7 +157,7 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
                     }
 
                     LatLng agentLatLng = new LatLng(locationLat, locationLng);
-                    mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Crime Reporter Location"));
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Crime Reporter Location"));
 
                 }
             }
@@ -125,6 +167,33 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
             }
         });
+    }
+
+    public void getAssignedReportInfo(){
+        DatabaseReference mCivilianDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("Report details");
+        mCivilianDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
+                    mCrimeAlertInfo.setVisibility(View.VISIBLE);
+                    Map<String,Object> map  = (Map<String, Object>) dataSnapshot.getValue();
+                    if(map.get("Crime Type")!= null){
+                        mCrimeTypeInfo.setText(map.get("Crime Category").toString());
+                    }
+                    if(map.get("Crime Description")!= null){
+                        mCrimeDescriptionInfo.setText(map.get("Crime Description").toString());
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
@@ -236,6 +305,25 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
                 break;
             }
         }
+    }
+
+    /* record the history of crime alerts responded to by agent */
+    public void recordAlertResponse(){
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(userId).child("responseHistory");
+        DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("responseHistory");
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("responseHistory");
+        String responseId = historyRef.push().getKey();
+        agentRef.child(responseId).setValue(true);
+        reporterRef.child(responseId).setValue(true);
+
+
+        HashMap map = new HashMap();
+        map.put("Security Agent", userId);
+        map.put("Civilian", civilianReporterId);
+        historyRef.child(responseId).updateChildren(map);
+
+
     }
 
 
