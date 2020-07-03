@@ -2,9 +2,13 @@ package com.example.tujilinde;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +38,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -96,36 +103,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
 
         mReportBtn = mView.findViewById(R.id.reportBtn);
-        mCancelBtn = mView.findViewById(R.id.cancelReportBtn);
+//        mCancelBtn = mView.findViewById(R.id.cancelReportBtn);
 
         mReportBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLastLocation != null) {
-                    requestBol = true;
-                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
-                    GeoFire geoFire = new GeoFire(ref);
-                    geoFire.setLocation(userId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-
-                    alertLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(alertLocation).title("My location"));
-
-                    mReportBtn.setText("REPORT IN PROGRESS...");
-
-//                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
-//
-//                    startActivity(intent);
-
-
-                    getClosestAgents();
-                }
-
-            }
-        });
-
-        mCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (requestBol){
@@ -134,8 +114,8 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     agentLocationRef.removeEventListener(agentLocationRefListener);
 
                     if (agentFoundID != null){
-                        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID);
-                        agentRef.setValue(true);
+                        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID).child("reporterId");
+                        agentRef.removeValue();
                         agentFoundID = null;
                     }
 
@@ -151,14 +131,79 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     if (locationMarker != null){
                         locationMarker.remove();
                     }
+                    if (mAgentMarker != null) {
+                        mAgentMarker.remove();
+                    }
                     mReportBtn.setText("REPORT A CRIME");
+                }else {
+                    requestBol = true;
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
+                    GeoFire geoFire = new GeoFire(ref);
+                    geoFire.setLocation(userId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+
+                    alertLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(alertLocation).title("My location").icon(bitmapDescriptorFromVector(getContext(), R.mipmap.ic_civilian)));
+
+                    mReportBtn.setText("ALERT NOW IN PROGRESS...");
+
+//                    Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+//
+//                    startActivity(intent);
+
+
+                    getClosestAgents();
                 }
 
             }
         });
 
+//        mCancelBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (requestBol){
+//                    requestBol = false;
+//                    geoQuery.removeAllListeners();
+//                    agentLocationRef.removeEventListener(agentLocationRefListener);
+//
+//                    if (agentFoundID != null){
+//                        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID);
+//                        agentRef.setValue(true);
+//                        agentFoundID = null;
+//                    }
+//
+//                    agentFound = false;
+//                    radius = 1;
+//
+//                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
+//                    GeoFire geoFire = new GeoFire(ref);
+//                    geoFire.removeLocation(userId);
+//
+//                    if (locationMarker != null){
+//                        locationMarker.remove();
+//                    }
+//                    mReportBtn.setText("REPORT A CRIME");
+//                }
+//
+//            }
+//        });
+
         return mView;
     }
+
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth() + -60, vectorDrawable.getIntrinsicHeight() + -60);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
 
     /*Check for security agents within the radius of the civilian making the report*/
     private void getClosestAgents(){
@@ -189,9 +234,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     mReportBtn.setText("Looking for Security Agent location...");
 
                 }
-                Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
-
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+//
+//                startActivity(intent);
 
             }
 
@@ -260,9 +305,13 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     }
                     else {
                         mReportBtn.setText("Security Agent Found: " + (distance));
+                        Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+
+                        startActivity(intent);
                     }
 
-                    mAgentMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Available Agent"));
+
+                    mAgentMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Available Agent").icon(bitmapDescriptorFromVector(getContext(), R.mipmap.ic_agent)));
 
 
 
