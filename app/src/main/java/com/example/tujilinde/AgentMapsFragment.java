@@ -2,8 +2,12 @@ package com.example.tujilinde;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -34,6 +39,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,9 +51,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
@@ -59,6 +69,10 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
     Marker locationMarker;
 
     private String civilianReporterId = "";
+    private Random random;
+    private int reference_number;
+    private String currentTime;
+
 
     DatabaseReference assignedReporterLocation;
     private ValueEventListener assignedReporterLocationListener;
@@ -88,7 +102,7 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.agent_map);
         if (mapFragment != null) {
-            mapFragment.getMapAsync((OnMapReadyCallback) this);
+            mapFragment.getMapAsync(this);
         }
 
 
@@ -102,6 +116,15 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         });
 
         return mView;
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth() + -40, vectorDrawable.getIntrinsicHeight() + -40);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     /*Get the id of the reporter mapped to the available security agent*/
@@ -157,7 +180,7 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
                     }
 
                     LatLng agentLatLng = new LatLng(locationLat, locationLng);
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Crime Reporter Location"));
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(agentLatLng).title("Crime Reporter Location").icon(bitmapDescriptorFromVector(getContext(), R.mipmap.ic_civilian)));
 
                 }
             }
@@ -307,8 +330,22 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         }
     }
 
+    public void generateReferenceNumber(){
+        random = new Random();
+        reference_number = random.nextInt(10000);
+
+    }
+
+    public void generateCurrentResponseTime(){
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyy hh:mm:ss a");
+        currentTime = simpleDateFormat.format(calendar.getTime());
+    }
+
     /* record the history of crime alerts responded to by agent */
     public void recordAlertResponse(){
+        generateReferenceNumber();
+        generateCurrentResponseTime();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(userId).child("responseHistory");
         DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("responseHistory");
@@ -321,6 +358,8 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         HashMap map = new HashMap();
         map.put("Security Agent", userId);
         map.put("Civilian", civilianReporterId);
+        map.put("Reference code", "RF" + reference_number);
+        map.put("Response datetime", currentTime);
         historyRef.child(responseId).updateChildren(map);
 
 

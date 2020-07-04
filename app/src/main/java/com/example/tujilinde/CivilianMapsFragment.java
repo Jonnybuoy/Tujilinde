@@ -331,7 +331,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setFastestInterval(2000);
         locationRequest.setInterval(4000);
@@ -341,13 +341,11 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
-            if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
-
+            if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
             }else{
 
-                callPermissions();
+                checkLocationPermission();
 
             }
 
@@ -383,7 +381,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
 
 
-    public void callPermissions(){
+    private void checkLocationPermission(){
 
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {

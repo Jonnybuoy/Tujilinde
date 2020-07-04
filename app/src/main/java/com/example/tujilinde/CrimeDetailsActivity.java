@@ -44,8 +44,8 @@ public class CrimeDetailsActivity extends AppCompatActivity {
     private String reporter_type;
     private String crime_description;
     private String currentTime;
-    private Random random;
-    private int reference_number;
+//    private Random random;
+//    private int reference_number;
 
 
 
@@ -224,11 +224,11 @@ public class CrimeDetailsActivity extends AppCompatActivity {
 
     }
 
-    public void generateReferenceNumber(){
-        random = new Random();
-        reference_number = random.nextInt(10000);
-
-    }
+//    public void generateReferenceNumber(){
+//        random = new Random();
+//        reference_number = random.nextInt(10000);
+//
+//    }
 
 
     public void getCrimeReportDetails(){
@@ -268,7 +268,7 @@ public class CrimeDetailsActivity extends AppCompatActivity {
     }
 
     public void saveCrimeDetails(){
-        generateReferenceNumber();
+//        generateReferenceNumber();
         crime_description = mCrimeDesc.getText().toString();
 
         if (crime_description.isEmpty()){
@@ -280,7 +280,6 @@ public class CrimeDetailsActivity extends AppCompatActivity {
         crimeDetails.put("Reporter", reporter_type);
         crimeDetails.put("Crime Description", crime_description);
         crimeDetails.put("Date of report", currentTime);
-        crimeDetails.put("Reference code", "RF" + reference_number);
         reportDetailsRef.updateChildren(crimeDetails);
 
 
