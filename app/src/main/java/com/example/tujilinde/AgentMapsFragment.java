@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -26,8 +28,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tujilinde.R;
+import com.example.tujilinde.historyRecyclerView.AlertHistoryObject;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -112,6 +117,12 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
             @Override
             public void onClick(View v) {
                 recordAlertResponse();
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                AgentReceivedReportsFragment fragment = new AgentReceivedReportsFragment();
+                fragmentTransaction.replace(R.id.agent_fragment_container, fragment);
+                fragmentTransaction.commit();
+                fragmentTransaction.addToBackStack(null);
             }
         });
 
@@ -193,8 +204,54 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
     }
 
     public void getAssignedReportInfo(){
-        DatabaseReference mCivilianDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("Report details");
-        mCivilianDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        String agentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference reporterIdRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentId).child("responseHistory");
+        reporterIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot history : dataSnapshot.getChildren()){
+                        FetchReportDetails(history.getKey());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+//        DatabaseReference mCivilianDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("Report details");
+//        mCivilianDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
+//                    mCrimeAlertInfo.setVisibility(View.VISIBLE);
+//                    Map<String,Object> map  = (Map<String, Object>) dataSnapshot.getValue();
+//                    if(map.get("Crime Type")!= null){
+//                        mCrimeTypeInfo.setText(map.get("Crime Category").toString());
+//                    }
+//                    if(map.get("Crime Description")!= null){
+//                        mCrimeDescriptionInfo.setText(map.get("Crime Description").toString());
+//                    }
+//
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+    }
+
+    private void FetchReportDetails(String key) {
+        DatabaseReference responseHistoryRef = FirebaseDatabase.getInstance().getReference().child("responseHistory").child(key);
+        responseHistoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
@@ -216,7 +273,6 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
 
             }
         });
-
     }
 
 
@@ -224,22 +280,19 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setFastestInterval(2000);
-        locationRequest.setInterval(4000);
 
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
             if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
+                mMap.setMyLocationEnabled(true);
 
             }else{
                 callPermissions();
             }
         }
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
-        mMap.setMyLocationEnabled(true);
+
 
 
     }
@@ -319,14 +372,51 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
             case 1:{
                 if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.getMainLooper());
-                        mMap.setMyLocationEnabled(true);
+                        startCurrentLocationUpdates();
                     }
                 } else{
                     Toast.makeText(getContext(), "Please provide the permission", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
+        }
+    }
+
+    private void startCurrentLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(4000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+                return;
+            }
+        }
+        if (mMap != null){
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+            new AlertDialog.Builder(getContext())
+                    .setCancelable(false)
+                    .setTitle("GPS not found")  // GPS not found
+                    .setMessage("Enable GPS to continue") // Want to enable?
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    })
+                    .show();
         }
     }
 
@@ -348,33 +438,64 @@ public class AgentMapsFragment extends Fragment implements OnMapReadyCallback{
         generateCurrentResponseTime();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(userId).child("responseHistory");
-        DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("responseHistory");
-        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("responseHistory");
-        String responseId = historyRef.push().getKey();
-        agentRef.child(responseId).setValue(true);
-        reporterRef.child(responseId).setValue(true);
+//        DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId).child("responseHistory");
+//        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("responseHistory");
+//        String responseId = historyRef.push().getKey();
+//        agentRef.child(responseId).setValue(true);
+//        reporterRef.child(responseId).setValue(true);
+
+        agentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    for (DataSnapshot history : dataSnapshot.getChildren()){
+                        SaveResponseDetails(history.getKey());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
-        HashMap map = new HashMap();
-        map.put("Security Agent", userId);
-        map.put("Civilian", civilianReporterId);
-        map.put("Reference code", "RF" + reference_number);
-        map.put("Response datetime", currentTime);
-        historyRef.child(responseId).updateChildren(map);
+
 
 
     }
 
+    private void SaveResponseDetails(String key) {
+        DatabaseReference responseHistoryRef = FirebaseDatabase.getInstance().getReference().child("responseHistory").child(key);
+        HashMap map = new HashMap();
+        map.put("Reference code", "RF" + reference_number);
+        map.put("Response datetime", currentTime);
+        responseHistoryRef.updateChildren(map);
+
+
+    }
 
     @Override
     public void onStop() {
         super.onStop();
+        if (fusedLocationProviderClient != null){
+            fusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+        }
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference refAvailable = FirebaseDatabase.getInstance().getReference("agentsAvailable");
 
         GeoFire geoFire = new GeoFire(refAvailable);
         geoFire.removeLocation(userId);
-
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+        startCurrentLocationUpdates();
+    }
+
+
 
 }

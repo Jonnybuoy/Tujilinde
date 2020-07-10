@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <Button
-        android:id="@+id/homeLoginbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#000000"
-        android:text="LOGIN"
-        android:textColor="#F3F4F7"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ImageView

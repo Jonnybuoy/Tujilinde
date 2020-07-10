@@ -24,7 +24,7 @@ public class AlertHistoryAdapter extends RecyclerView.Adapter<AlertHistoryViewHo
     @NonNull
     @Override
     public AlertHistoryViewHolders onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_items, null, false);
+        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_items, parent, false);
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
         AlertHistoryViewHolders rev = new AlertHistoryViewHolders(layoutView);
@@ -41,6 +41,6 @@ public class AlertHistoryAdapter extends RecyclerView.Adapter<AlertHistoryViewHo
 
     @Override
     public int getItemCount() {
-        return 0;
+        return this.itemList.size();
     }
 }

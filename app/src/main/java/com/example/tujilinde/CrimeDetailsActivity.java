@@ -36,7 +36,7 @@ public class CrimeDetailsActivity extends AppCompatActivity {
     Button mDetailsBtn;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference reportDetailsRef;
+    private DatabaseReference historyRef;
 
     private String userId;
     private String crime_category;
@@ -218,7 +218,7 @@ public class CrimeDetailsActivity extends AppCompatActivity {
             }
         });
 
-        getCrimeReportDetails();
+        fetchReportHistoryId();
 
 
 
@@ -230,10 +230,29 @@ public class CrimeDetailsActivity extends AppCompatActivity {
 //
 //    }
 
+    public void fetchReportHistoryId(){
+        DatabaseReference reporterIdRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(userId).child("responseHistory");
+        reporterIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot history : dataSnapshot.getChildren()){
+                        FetchReportDetails(history.getKey());
+                    }
 
-    public void getCrimeReportDetails(){
-        reportDetailsRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(userId).child("Report details");
-        reportDetailsRef.addValueEventListener(new ValueEventListener() {
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void FetchReportDetails(String key) {
+        historyRef = FirebaseDatabase.getInstance().getReference().child("responseHistory").child(key);
+        historyRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0 ){
@@ -264,8 +283,9 @@ public class CrimeDetailsActivity extends AppCompatActivity {
 
             }
         });
-
     }
+
+
 
     public void saveCrimeDetails(){
 //        generateReferenceNumber();
@@ -280,7 +300,7 @@ public class CrimeDetailsActivity extends AppCompatActivity {
         crimeDetails.put("Reporter", reporter_type);
         crimeDetails.put("Crime Description", crime_description);
         crimeDetails.put("Date of report", currentTime);
-        reportDetailsRef.updateChildren(crimeDetails);
+        historyRef.updateChildren(crimeDetails);
 
 
     }

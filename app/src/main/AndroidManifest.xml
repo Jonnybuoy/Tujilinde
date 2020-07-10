@@ -16,6 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AgentReceivedCrimeDetail"></activity>
+        <activity android:name=".SignInVerifyPhoneActivity" />
+        <activity android:name=".SignInActivity" />
         <activity
             android:name=".AgentNavigationActivity"
             android:exported="true"

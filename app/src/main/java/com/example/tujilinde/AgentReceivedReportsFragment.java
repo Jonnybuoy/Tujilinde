@@ -4,14 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class  AgentReceivedReportsFragment extends Fragment {
 
@@ -63,29 +58,10 @@ public class  AgentReceivedReportsFragment extends Fragment {
         agentID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         fetchResponseHistoryId();
 
-
-
-//        mRefButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentManager fragmentManager = getFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                AgentReceivedCrimeDetails fragment = new AgentReceivedCrimeDetails();
-//                fragmentTransaction.replace(R.id.agent_fragment_container, fragment);
-//                fragmentTransaction.commit();
-//                fragmentTransaction.addToBackStack(null);
-//            }
-//        });
-
-
-
         return mView;
     }
 
-    private ArrayList resultsHistory = new ArrayList<AlertHistoryObject>();
-    private List<AlertHistoryObject> getDataSetHistory() {
-        return resultsHistory;
-    }
+
 
     public void fetchResponseHistoryId() {
         DatabaseReference reporterIdRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentID).child("responseHistory");
@@ -121,7 +97,7 @@ public class  AgentReceivedReportsFragment extends Fragment {
                     if (dataSnapshot.child("Response datetime").getValue() != null){
                         date = dataSnapshot.child("Response datetime").getValue().toString();
                     }
-                    if (dataSnapshot.child("Response datetime").getValue() != null){
+                    if (dataSnapshot.child("Reference code").getValue() != null){
                         refCode = dataSnapshot.child("Reference code").getValue().toString();
                     }
                     AlertHistoryObject object = new AlertHistoryObject(date, refCode);
@@ -139,31 +115,10 @@ public class  AgentReceivedReportsFragment extends Fragment {
         });
     }
 
-//    public void fetchReportDetails(){
-//        DatabaseReference ReportRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianId).child("Report details");
-//        ReportRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
-//                    Map<String,Object> map  = (Map<String, Object>) dataSnapshot.getValue();
-//                    if(map.get("Date of report")!= null){
-//                        mReportDate.setText(map.get("Date of report").toString());
-//                    }
-//
-//                    if(map.get("Reference code")!= null){
-//                        mRefButton.setText(map.get("Reference code").toString());
-//                    }
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//
-//
-//    }
+    private ArrayList resultsHistory = new ArrayList<AlertHistoryObject>();
+    private List<AlertHistoryObject> getDataSetHistory() {
+        return resultsHistory;
+    }
+
+
 }

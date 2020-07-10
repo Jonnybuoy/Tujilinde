@@ -58,6 +58,12 @@ public class AgentNavigationActivity extends AppCompatActivity implements Naviga
             super.onBackPressed();
         }
 
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+
     }
 
     @Override
@@ -102,4 +108,5 @@ public class AgentNavigationActivity extends AppCompatActivity implements Naviga
 
 
     }
+
 }

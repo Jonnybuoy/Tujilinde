@@ -5,6 +5,66 @@
     android:background="#333333"
     android:orientation="vertical">
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Alert Location:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="	#A9A9A9" />
+
+        <TextView
+            android:id="@+id/text_alert_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="#F7FAF8F8" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Name of Reporter:  "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#A9A9A9" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtReporterName"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="#F7FAF8F8" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +80,7 @@
             android:layout_weight="1"
             android:text="Crime Category:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8" />
+            android:textColor="#A9A9A9" />
 
         <TextView
             android:id="@+id/text_crime_category"
@@ -47,7 +107,7 @@
             android:layout_weight="1"
             android:text="Type Of Crime:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8" />
+            android:textColor="	#A9A9A9" />
 
         <TextView
             android:id="@+id/text_crime_type"
@@ -72,7 +132,7 @@
             android:layout_weight="1"
             android:text="Reporter's Crime Description:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8" />
+            android:textColor="#A9A9A9" />
 
         <TextView
             android:id="@+id/text_crime_description"
@@ -99,7 +159,7 @@
             android:singleLine="true"
             android:text="Type of Reporter:  "
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#F7FAF8F8" />
+            android:textColor="#A9A9A9" />
 
         <TextView
             android:id="@+id/text_reported_as"

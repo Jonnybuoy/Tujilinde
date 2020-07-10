@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -50,6 +51,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
 
 
-    private Button mReportBtn, mCancelBtn;
+    private Button mReportBtn;
 
     private int radius = 1;
     private Boolean agentFound = false;
@@ -159,37 +161,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
             }
         });
 
-//        mCancelBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (requestBol){
-//                    requestBol = false;
-//                    geoQuery.removeAllListeners();
-//                    agentLocationRef.removeEventListener(agentLocationRefListener);
-//
-//                    if (agentFoundID != null){
-//                        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID);
-//                        agentRef.setValue(true);
-//                        agentFoundID = null;
-//                    }
-//
-//                    agentFound = false;
-//                    radius = 1;
-//
-//                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("crimeAlert");
-//                    GeoFire geoFire = new GeoFire(ref);
-//                    geoFire.removeLocation(userId);
-//
-//                    if (locationMarker != null){
-//                        locationMarker.remove();
-//                    }
-//                    mReportBtn.setText("REPORT A CRIME");
-//                }
-//
-//            }
-//        });
+
 
         return mView;
     }
@@ -230,7 +202,13 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                     map.put("reporterId", civilianReporterId);
                     agentRef.updateChildren(map);
 
+                    DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(civilianReporterId);
+                    HashMap mMap = new HashMap();
+                    mMap.put("securityAgentId", agentFoundID);
+                    reporterRef.updateChildren(mMap);
+
                     getAgentLocation();
+                    recordReport();
                     mReportBtn.setText("Looking for Security Agent location...");
 
                 }
@@ -265,6 +243,21 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
             }
         });
 
+    }
+
+    private void recordReport() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference reporterRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(userId).child("responseHistory");
+        DatabaseReference agentRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Security Agents").child(agentFoundID).child("responseHistory");
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("responseHistory");
+        String reportId = historyRef.push().getKey();
+        agentRef.child(reportId).setValue(true);
+        reporterRef.child(reportId).setValue(true);
+
+        HashMap map = new HashMap();
+        map.put("Crime Reporter", userId);
+        map.put("Agent Responder", agentFoundID);
+        historyRef.child(reportId).updateChildren(map);
     }
 
     // Alert reporter on agent location
@@ -302,6 +295,9 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
 
                     if (distance < 100){
                         mReportBtn.setText("Security Agent has arrived");
+                        Intent intent = new Intent(getActivity(), CrimeDetailsActivity.class);
+
+                        startActivity(intent);
                     }
                     else {
                         mReportBtn.setText("Security Agent Found: " + (distance));
@@ -331,17 +327,15 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setFastestInterval(2000);
-        locationRequest.setInterval(4000);
-
 
 
 
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
             if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
+                mMap.setMyLocationEnabled(true);
 
             }else{
 
@@ -350,9 +344,6 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
             }
 
         }
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
-        mMap.setMyLocationEnabled(true);
 
     }
 
@@ -412,8 +403,7 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
             case 1:{
                 if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.getMainLooper());
-                        mMap.setMyLocationEnabled(true);
+                        startCurrentLocationUpdates();
                     }
                 } else{
                     Toast.makeText(getContext(), "Please provide the permission", Toast.LENGTH_LONG).show();
@@ -421,5 +411,57 @@ public class CivilianMapsFragment extends Fragment implements OnMapReadyCallback
                 break;
             }
         }
+    }
+
+    private void startCurrentLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(4000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+                return;
+            }
+        }
+        if (mMap != null){
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
+            mMap.setMyLocationEnabled(true);
+        }
+
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+            new AlertDialog.Builder(getContext())
+                    .setCancelable(false)
+                    .setTitle("GPS not found")  // GPS not found
+                    .setMessage("Enable GPS to continue") // Want to enable?
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    })
+                    .show();
+        }
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (fusedLocationProviderClient != null)
+            fusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+            startCurrentLocationUpdates();
     }
 }
