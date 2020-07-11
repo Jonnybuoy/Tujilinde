@@ -1,14 +1,19 @@
 package com.example.tujilinde;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,11 +35,14 @@ import java.util.Random;
 public class CrimeDetailsActivity extends AppCompatActivity {
 
 
+    private static final int PICK_IMAGE_REQUEST = 1 ;
     Spinner mCrimeCategory;
     Spinner mCrimeType;
     Spinner mReporterType;
     EditText mCrimeDesc;
-    Button mDetailsBtn;
+    Button mDetailsBtn, mUploadBtn;
+    ProgressBar mUploadprogress;
+    ImageView mImageView;
 
     private FirebaseAuth mAuth;
     private DatabaseReference historyRef;
@@ -44,6 +53,8 @@ public class CrimeDetailsActivity extends AppCompatActivity {
     private String reporter_type;
     private String crime_description;
     private String currentTime;
+
+    private Uri mImageUri;
 //    private Random random;
 //    private int reference_number;
 
@@ -61,6 +72,9 @@ public class CrimeDetailsActivity extends AppCompatActivity {
         mReporterType = findViewById(R.id.spinnerReporterType);
         mCrimeDesc = findViewById(R.id.textCrimeDesc);
         mDetailsBtn = findViewById(R.id.crime_details_submit_btn);
+        mUploadBtn = findViewById(R.id.btnUploadMedia);
+        mUploadprogress = findViewById(R.id.progress_bar);
+        mImageView = findViewById(R.id.image_view);
 
         mAuth = FirebaseAuth.getInstance();
         userId = mAuth.getCurrentUser().getUid();
@@ -218,17 +232,45 @@ public class CrimeDetailsActivity extends AppCompatActivity {
             }
         });
 
+        mUploadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser();
+
+            }
+        });
+
         fetchReportHistoryId();
 
 
 
     }
 
-//    public void generateReferenceNumber(){
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data !=null && data.getData() != null){
+            mImageUri = data.getData();
+
+            Picasso.with(this).load(mImageUri).into(mImageView);
+
+        }
+    }
+
+    //    public void generateReferenceNumber(){
 //        random = new Random();
 //        reference_number = random.nextInt(10000);
 //
 //    }
+
 
     public void fetchReportHistoryId(){
         DatabaseReference reporterIdRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Civilians").child(userId).child("responseHistory");
